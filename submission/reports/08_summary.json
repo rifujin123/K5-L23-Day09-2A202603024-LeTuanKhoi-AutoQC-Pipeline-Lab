@@ -1,0 +1,18 @@
+{
+  "verdict": {
+    "decision": "Release",
+    "n_errors": 0,
+    "n_warn_images": 18,
+    "n_images": 202,
+    "warn_ratio": 0.0891,
+    "reasons": [
+      "Không còn lỗi bắt buộc; cảnh báo ở 18/202 ảnh (8.91%), dưới ngưỡng Hold 10.00%."
+    ]
+  },
+  "reviewed": 80,
+  "budget": 80,
+  "seconds": 7.6,
+  "exported": "D:\\Workspace\\K5-L23-Day09-2A202603024-LeTuanKhoi-AutoQC-Pipeline-Lab\\submission\\export\\clean_v1",
+  "config_sha1": "0721bc01546f92f38a87b933d4e66bf0095a34ea",
+  "review_sim_sha1": "7988ca22827f780a7043a2300490e679a1697154"
+}

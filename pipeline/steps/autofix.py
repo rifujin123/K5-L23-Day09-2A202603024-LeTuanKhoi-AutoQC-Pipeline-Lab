@@ -35,5 +35,122 @@ from ..common import ERROR, parse_yolo_line  # noqa: F401
 
 
 def fix(ds, issues, cfg):
-    # TODO
-    raise NotImplementedError("autofix chưa làm")
+    # Chỉ lập kế hoạch sửa cho ERROR; WARN luôn để người xem.
+    fixes = []
+    line_codes = defaultdict(lambda: defaultdict(set))
+    remove_images = set()
+    needs_labels = set()
+    rename_classes = False
+    drop_codes = {"BAD_FORMAT", "BAD_CLASS_ID", "BOX_ZERO", "DUP_BOX"}
+    remove_codes = {"LEAK_TEST", "CORRUPT_IMAGE", "BAD_SIZE"}
+
+    # Gom lỗi trước khi đụng vào file để giữ nguyên số dòng gốc.
+    for issue in issues:
+        if issue.severity != ERROR:
+            continue
+        if issue.code.startswith("DUP_IMAGE_") or issue.code in remove_codes:
+            remove_images.add(issue.image)
+        elif issue.code == "MISSING_LABEL_FILE":
+            needs_labels.add(issue.image)
+        elif issue.code == "BAD_CLASS_NAME":
+            rename_classes = True
+        elif issue.code in drop_codes | {"BOX_OUT_OF_IMAGE"} and issue.line is not None:
+            line_codes[issue.image][int(issue.line)].add(issue.code)
+
+    # Xóa ảnh và nhãn trong ds; một ảnh chỉ tạo một bản ghi dù có nhiều lỗi loại ảnh.
+    for stem in sorted(remove_images):
+        image_paths = [p for p in ds.image_files() if p.stem == stem]
+        label_path = ds.label_path(stem)
+        targets = image_paths + ([label_path] if label_path.exists() else [])
+        if not targets:
+            continue
+        before = ";".join(p.name for p in targets)
+        for path in targets:
+            path.unlink(missing_ok=True)
+        fixes.append(dict(image=stem, line=None, action="remove_image", before=before, after="(đã xóa khỏi ds)"))
+
+    # Chuyển ảnh chưa có nhãn cho người gán, tuyệt đối không tạo file .txt rỗng.
+    for stem in sorted(needs_labels - remove_images):
+        if ds.image_path(stem) is None or ds.label_path(stem).exists():
+            continue
+        fixes.append(dict(image=stem, line=None, action="needs_label", before="(không có file)", after="chuyển người gán"))
+
+    # Sửa riêng names trong data.yaml và giữ lại các khóa cấu hình khác nếu có.
+    if rename_classes:
+        yaml_path = ds.yaml_path
+        try:
+            document = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
+        except (OSError, yaml.YAMLError):
+            document = {}
+        if not isinstance(document, dict):
+            document = {}
+        classes = list(cfg["classes"])
+        old_names = document.get("names", "(thiếu names)")
+        if isinstance(old_names, list):
+            normalized_names = dict(enumerate(old_names))
+        elif isinstance(old_names, dict):
+            try:
+                normalized_names = {int(key): value for key, value in old_names.items()}
+            except (TypeError, ValueError):
+                normalized_names = {}
+        else:
+            normalized_names = {}
+        if normalized_names != dict(enumerate(classes)):
+            document["names"] = classes
+            yaml_path.write_text(yaml.safe_dump(document, allow_unicode=True, sort_keys=False), encoding="utf-8")
+            fixes.append(dict(image="data.yaml", line=None, action="rename_classes", before=str(old_names), after=str(classes)))
+
+    # Sửa từng file nhãn đúng một lần, xử lý các line theo số dòng ban đầu.
+    for stem in sorted(line_codes):
+        if stem in remove_images:
+            continue
+        label_path = ds.label_path(stem)
+        if not label_path.exists():
+            continue
+        raw_lines = label_path.read_text(encoding="utf-8", errors="replace").splitlines(keepends=True)
+        rewritten = []
+        changed = False
+        for line_no, raw_line in enumerate(raw_lines, 1):
+            body = raw_line.rstrip("\r\n")
+            ending = raw_line[len(body):]
+            codes = line_codes[stem].get(line_no, set())
+            if not codes:
+                rewritten.append(raw_line)
+                continue
+            # Xóa dòng thắng mọi sửa khác trên cùng dòng, ví dụ DUP_BOX + BOX_OUT_OF_IMAGE.
+            if codes & drop_codes:
+                fixes.append(dict(image=stem, line=line_no, action="drop_line", before=body, after=""))
+                changed = True
+                continue
+            if "BOX_OUT_OF_IMAGE" not in codes:
+                rewritten.append(raw_line)
+                continue
+            # Parse lại dòng để tính tọa độ cắt; issue lỗi thời hoặc dòng hỏng được bỏ qua an toàn.
+            parts = body.split()
+            try:
+                class_id, cx, cy, width, height = parse_yolo_line(body)
+            except (ValueError, OverflowError):
+                rewritten.append(raw_line)
+                continue
+            left, top = max(0.0, cx - width / 2), max(0.0, cy - height / 2)
+            right, bottom = min(1.0, cx + width / 2), min(1.0, cy + height / 2)
+            clipped_width, clipped_height = right - left, bottom - top
+            # Box nằm hẳn ngoài ảnh sau khi cắt thì phải xóa, không ghi kích thước âm hoặc 0.
+            if clipped_width <= 0 or clipped_height <= 0:
+                fixes.append(dict(image=stem, line=line_no, action="drop_line", before=body, after=""))
+                changed = True
+                continue
+            clipped = ((left + right) / 2, (top + bottom) / 2, clipped_width, clipped_height)
+            if clipped == (cx, cy, width, height):
+                rewritten.append(raw_line)
+                continue
+            # Giữ nguyên token class ID, còn bốn tọa độ được ghi với độ chính xác đủ để tái đọc.
+            after = " ".join([parts[0], *(format(value, ".12g") for value in clipped)])
+            fixes.append(dict(image=stem, line=line_no, action="clip_box", before=body, after=after))
+            rewritten.append(after + ending)
+            changed = True
+        # Ghi file một lần sau khi mọi số dòng gốc đã được xử lý.
+        if changed:
+            label_path.write_text("".join(rewritten), encoding="utf-8")
+
+    return fixes

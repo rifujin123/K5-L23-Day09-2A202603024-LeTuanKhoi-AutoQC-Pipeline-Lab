@@ -1,0 +1,36 @@
+check,severity,code,image,line,message,extra
+missing_labels,warn,EMPTY_LABEL,img_0013,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0097,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0129,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+missing_labels,warn,EMPTY_LABEL,img_0192,,file nhãn rỗng: ảnh nền hay thiếu nhãn?,
+label_format,warn,BOX_HUGE,img_0018,1,Box chiếm diện tích quá lớn,
+label_format,warn,BOX_TINY,img_0026,6,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_TINY,img_0051,5,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_HUGE,img_0128,1,Box chiếm diện tích quá lớn,
+label_format,warn,BOX_TINY,img_0161,2,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_TINY,img_0161,3,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_TINY,img_0161,4,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_TINY,img_0183,11,Cạnh ngắn của box nhỏ hơn ngưỡng pixel,
+label_format,warn,BOX_HUGE,img_0196,1,Box chiếm diện tích quá lớn,
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0014,2,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.145),"{""iou"": 0.1450117456567434, ""conf"": 0.2301}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0021,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.486),"{""conf"": 0.8362, ""iou"": 0.4859935892263159}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0022,2,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.000),"{""iou"": 0.0, ""conf"": 0.8483}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0036,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.427),"{""conf"": 0.8733, ""iou"": 0.42652477076992373}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0045,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.335),"{""conf"": 0.7519, ""iou"": 0.33476178349319957}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0046,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.382),"{""conf"": 0.8928, ""iou"": 0.3823233906495968}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0062,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.471),"{""conf"": 0.8051, ""iou"": 0.4710198159663405}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0068,8,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.199),"{""iou"": 0.19889536171485311, ""conf"": 0.7877}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0075,6,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.107),"{""iou"": 0.10672083058763539, ""conf"": 0.396}"
+second_opinion,warn,POSSIBLE_WRONG_CLASS,img_0078,,Dự đoán lớp 0 khớp box nhãn lớp khác (IoU 0.919),"{""conf"": 0.8287, ""iou"": 0.9189310218686991}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0082,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.483),"{""conf"": 0.8085, ""iou"": 0.4834327463044831}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0091,10,Box nhãn lớp 2 không khớp dự đoán nào (IoU lớn nhất 0.124),"{""iou"": 0.12359206869958318, ""conf"": 0.9558}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0100,4,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.035),"{""iou"": 0.03467085612461127, ""conf"": 0.1985}"
+second_opinion,warn,POSSIBLE_MISSING,img_0121,,Model thấy vật lớp 1 nhưng không có box nhãn khớp (conf 0.764),"{""conf"": 0.7641, ""iou"": 0.0}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0124,8,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.036),"{""iou"": 0.03620175556397309, ""conf"": 0.9435}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0125,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.421),"{""conf"": 0.8328, ""iou"": 0.42099341975298876}"
+second_opinion,warn,POSSIBLE_LOOSE_BOX,img_0127,,Box nhãn cùng lớp khớp lỏng với dự đoán (IoU 0.437),"{""conf"": 0.8845, ""iou"": 0.4371643526339286}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0131,11,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.000),"{""iou"": 0.0, ""conf"": 0.8922}"
+second_opinion,warn,POSSIBLE_MISSING,img_0160,,Model thấy vật lớp 2 nhưng không có box nhãn khớp (conf 0.777),"{""conf"": 0.7768, ""iou"": 0.0}"
+second_opinion,warn,POSSIBLE_MISSING,img_0183,,Model thấy vật lớp 1 nhưng không có box nhãn khớp (conf 0.810),"{""conf"": 0.8104, ""iou"": 0.0}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0191,1,Box nhãn lớp 0 không khớp dự đoán nào (IoU lớn nhất 0.256),"{""iou"": 0.25644187130435536, ""conf"": 0.3155}"
+second_opinion,warn,POSSIBLE_FALSE_POS,img_0212,4,Box nhãn lớp 1 không khớp dự đoán nào (IoU lớn nhất 0.150),"{""iou"": 0.15014265209152355, ""conf"": 0.6733}"
